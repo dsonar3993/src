@@ -12,7 +12,7 @@
       href="src/assets/img/apple-icon.png"
     />
     <link rel="icon" type="image/png" href="src/assets/img/favicon.png" />
-    <title>Soft UI Dashboard by Creative Tim</title>
+    <title>Soft UI Dashboard by Nilasu Consulting Services</title>
     <!--     Fonts and icons     -->
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
@@ -65,84 +65,92 @@
         if (loader) loader.style.display = "none";
       }
 
+      function showError(message) {
+        const errorBox = document.getElementById("formMessage");
+        if (!errorBox) return;
+        errorBox.className = "alert alert-danger d-block";
+        errorBox.textContent = message;
+      }
+
+      function showSuccess(message) {
+        const errorBox = document.getElementById("formMessage");
+        if (!errorBox) return;
+        errorBox.className = "alert alert-success d-block";
+        errorBox.textContent = message;
+      }
+
+      function hideMessage() {
+        const errorBox = document.getElementById("formMessage");
+        if (!errorBox) return;
+        errorBox.className = "alert d-none";
+        errorBox.textContent = "";
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
-        loadCandidates();
-        loadClients();
+        loadDropdowns();
       });
 
-      function loadCandidates() {
+      async function loadDropdowns() {
+        hideMessage();
         showLoader();
 
-        google.script.run
-          .withSuccessHandler((data) => {
-            hideLoader();
-            populateCandidates(data);
-          })
-          .withFailureHandler((err) => {
-            hideLoader();
-            console.error("Error loading candidates:", err);
-            alert(err.message || "Failed to load candidates");
-          })
-          .getCandidates();
+        try {
+          const [candidateResponse, clientResponse] = await Promise.all([
+            fetch("api/candidates.php", {
+              headers: { Accept: "application/json" }
+            }),
+            fetch("api/clients.php", {
+              headers: { Accept: "application/json" }
+            })
+          ]);
+
+          const [candidatePayload, clientPayload] = await Promise.all([
+            candidateResponse.json(),
+            clientResponse.json()
+          ]);
+
+          if (!candidateResponse.ok || !candidatePayload.success) {
+            throw new Error(candidatePayload.error || "Failed to load candidates.");
+          }
+
+          if (!clientResponse.ok || !clientPayload.success) {
+            throw new Error(clientPayload.error || "Failed to load clients.");
+          }
+
+          populateCandidates(Array.isArray(candidatePayload.data) ? candidatePayload.data : []);
+          populateClients(Array.isArray(clientPayload.data) ? clientPayload.data : []);
+        } catch (error) {
+          showError(error && error.message ? error.message : "Failed to load form options.");
+        } finally {
+          hideLoader();
+        }
       }
 
       function populateCandidates(candidates) {
         const select = document.getElementById("candidateName");
-        if (!select) {
-          console.error("candidateName dropdown not found");
-          return;
-        }
+        if (!select) return;
 
         select.innerHTML = '<option value="">Select Candidate</option>';
 
-        if (!Array.isArray(candidates)) {
-          console.error("Invalid candidates data:", candidates);
-          return;
-        }
-
-        candidates.forEach((c) => {
-          const opt = document.createElement("option");
-          opt.value = c.name || "";
-          opt.textContent = c.name || "Unnamed";
-          select.appendChild(opt);
+        candidates.forEach((candidate) => {
+          const option = document.createElement("option");
+          option.value = candidate.name || "";
+          option.textContent = candidate.name || "Unnamed";
+          select.appendChild(option);
         });
-      }
-
-      function loadClients() {
-        showLoader();
-
-        google.script.run
-          .withSuccessHandler((data) => {
-            hideLoader();
-            populateClients(data);
-          })
-          .withFailureHandler((err) => {
-            hideLoader();
-            console.error("Error loading clients:", err);
-            alert(err.message || "Failed to load clients");
-          })
-          .getClients();
       }
 
       function populateClients(clients) {
         const select = document.getElementById("clientName");
-        if (!select) {
-          console.error("clientName dropdown not found");
-          return;
-        }
+        if (!select) return;
 
         select.innerHTML = '<option value="">Select Client</option>';
 
-        if (!Array.isArray(clients)) {
-          console.error("Invalid clients data:", clients);
-          return;
-        }
-
-        clients.forEach((c) => {
-          const opt = document.createElement("option");
-          opt.value = c.name || "";
-          opt.textContent = c.name || "Unnamed";
-          select.appendChild(opt);
+        clients.forEach((client) => {
+          const option = document.createElement("option");
+          option.value = client.name || "";
+          option.textContent = client.name || "Unnamed";
+          select.appendChild(option);
         });
       }
     </script>
@@ -703,6 +711,7 @@
             <p class="text-sm mb-0 text-muted">Capture staffing, commercial, and salary details in one place.</p>
           </div>
           <div class="card-body">
+            <div id="formMessage" class="alert d-none" role="alert"></div>
             <div id="loader" class="text-center py-3" style="display: none">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -916,7 +925,7 @@
                   href="https://www.creative-tim.com"
                   class="font-weight-bold"
                   target="_blank"
-                  >Creative Tim</a
+                  >Nilasu Consulting Services</a
                 >
                 for a better web.
               </div>
@@ -930,7 +939,7 @@
                     href="https://www.creative-tim.com"
                     class="nav-link text-muted"
                     target="_blank"
-                    >Creative Tim</a
+                    >Nilasu Consulting Services</a
                   >
                 </li>
                 <li class="nav-item">
@@ -1083,7 +1092,7 @@
       bonusAmt.addEventListener("input", calculateGrossMargin);
       bonusPayTenure.addEventListener("change", calculateGrossMargin);
 
-      document.getElementById("accountsForm").addEventListener("submit", function (e) {
+      document.getElementById("accountsForm").addEventListener("submit", async function (e) {
         e.preventDefault();
         const data = {
           candidateName: candidateName.value,
@@ -1115,12 +1124,35 @@
           approval: approval.value,
           grossMargin: grossMargin.value
         };
-        google.script.run
-          .withSuccessHandler(() => {
-            alert("Record saved successfully");
-            document.getElementById("accountsForm").reset();
-          })
-          .submitAccount(data);
+        hideMessage();
+
+        const submitButton = this.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+
+        try {
+          const response = await fetch("api/esf_create.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify(data)
+          });
+
+          const payload = await response.json();
+
+          if (!response.ok || !payload.success) {
+            throw new Error(payload.error || "Failed to save ESF record.");
+          }
+
+          showSuccess(payload.message || "Record saved successfully.");
+          document.getElementById("accountsForm").reset();
+          bonusAmountInput.disabled = true;
+        } catch (error) {
+          showError(error && error.message ? error.message : "Failed to save ESF record.");
+        } finally {
+          if (submitButton) submitButton.disabled = false;
+        }
       });
     </script>
     <!--   Core JS Files   -->

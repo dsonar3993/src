@@ -4,7 +4,7 @@
 
 ![Image](https://s3.amazonaws.com/creativetim_bucket/products/487/original/opt_sdp_thumbnail.jpg?1622812208)
 
-Most complex and innovative Dashboard Made by [Creative Tim](https://creative-tim.com/). Check our latest Free Bootstrap 5 Dashboard.
+Most complex and innovative Dashboard Made by [Nilasu Consulting Services](https://creative-tim.com/). Check our latest Free Bootstrap 5 Dashboard.
 
 Designed for those who like bold elements and beautiful websites. Made of hundred of elements, designed blocks and fully coded pages, Soft UI Dashboard is ready to help you create stunning websites and webapps.
 
@@ -79,7 +79,7 @@ Let us know your thoughts below. And good luck with development!
 
 Quick start options:
 
-- Download from [Creative Tim](https://www.creative-tim.com/product/soft-ui-dashboard?ref=readme-sud).
+- Download from [Nilasu Consulting Services](https://www.creative-tim.com/product/soft-ui-dashboard?ref=readme-sud).
 
 ## Terminal Commands
 
@@ -143,24 +143,24 @@ If you have questions or need help integrating the product please [contact us](h
 
 ## Licensing
 
-- Copyright 2021 [Creative Tim](https://www.creative-tim.com?ref=readme-sud)
-- Creative Tim [license](https://www.creative-tim.com/license?ref=readme-sud)
+- Copyright 2021 [Nilasu Consulting Services](https://www.creative-tim.com?ref=readme-sud)
+- Nilasu Consulting Services [license](https://www.creative-tim.com/license?ref=readme-sud)
 
 ## Useful Links
 
-- [More products](https://www.creative-tim.com/templates?ref=readme-sud) from Creative Tim
+- [More products](https://www.creative-tim.com/templates?ref=readme-sud) from Nilasu Consulting Services
 
 - [Tutorials](https://www.youtube.com/channel/UCVyTG4sCw-rOvB9oHkzZD1w)
 
-- [Freebies](https://www.creative-tim.com/bootstrap-themes/free?ref=readme-sud) from Creative Tim
+- [Freebies](https://www.creative-tim.com/bootstrap-themes/free?ref=readme-sud) from Nilasu Consulting Services
 
 - [Affiliate Program](https://www.creative-tim.com/affiliates/new?ref=readme-sud) (earn money)
 
 ##### Social Media
 
-Twitter: <https://twitter.com/CreativeTim>
+Twitter: <https://twitter.com/NilasuConsulting>
 
-Facebook: <https://www.facebook.com/CreativeTim>
+Facebook: <https://www.facebook.com/NilasuConsulting>
 
 Dribbble: <https://dribbble.com/creativetim>
 

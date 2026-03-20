@@ -12,7 +12,7 @@
       href="src/assets/img/apple-icon.png"
     />
     <link rel="icon" type="image/png" href="src/assets/img/favicon.png" />
-    <title>Soft UI Dashboard by Creative Tim</title>
+    <title>Soft UI Dashboard by Nilasu Consulting Services</title>
     <!--     Fonts and icons     -->
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
@@ -610,6 +610,7 @@
             <p class="text-sm mb-0 text-muted">Fill in the client details below.</p>
           </div>
           <div class="card-body">
+            <div id="formMessage" class="alert d-none" role="alert"></div>
             <form id="clientForm">
               <div class="row g-4">
                 <div class="col-lg-3 col-md-6">
@@ -686,7 +687,7 @@
                   href="https://www.creative-tim.com"
                   class="font-weight-bold"
                   target="_blank"
-                  >Creative Tim</a
+                  >Nilasu Consulting Services</a
                 >
                 for a better web.
               </div>
@@ -700,7 +701,7 @@
                     href="https://www.creative-tim.com"
                     class="nav-link text-muted"
                     target="_blank"
-                    >Creative Tim</a
+                    >Nilasu Consulting Services</a
                   >
                 </li>
                 <li class="nav-item">
@@ -734,28 +735,63 @@
       </footer>
     </main>
     <script>
-      document.getElementById("clientForm").addEventListener("submit", function (e) {
+      function showFormMessage(message, type = "success") {
+        const box = document.getElementById("formMessage");
+        if (!box) return;
+        box.className = `alert alert-${type} d-block`;
+        box.textContent = message;
+      }
+
+      function hideFormMessage() {
+        const box = document.getElementById("formMessage");
+        if (!box) return;
+        box.className = "alert d-none";
+        box.textContent = "";
+      }
+
+      document.getElementById("clientForm").addEventListener("submit", async function (e) {
         e.preventDefault();
+        hideFormMessage();
+
+        const submitButton = this.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
 
         const data = {
-          clientName: clientName.value,
-          email: clientEmail.value,
-          mobile: clientMobile.value,
-          city: clientCity.value,
-          country: clientCountry.value,
-          industry: clientIndustry.value,
+          clientName: clientName.value.trim(),
+          email: clientEmail.value.trim(),
+          mobile: clientMobile.value.trim(),
+          city: clientCity.value.trim(),
+          country: clientCountry.value.trim(),
+          industry: clientIndustry.value.trim(),
           requirebgv: requirebgv.value,
           billingType: billingType.value,
           burden: burdenPer.value,
           workingDays: workingDays.value
         };
 
-        google.script.run
-          .withSuccessHandler(() => {
-            alert("Client saved successfully");
-            document.getElementById("clientForm").reset();
-          })
-          .submitClient(data);
+        try {
+          const response = await fetch("api/client_create.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify(data)
+          });
+
+          const payload = await response.json();
+
+          if (!response.ok || !payload.success) {
+            throw new Error(payload.error || "Failed to save client.");
+          }
+
+          showFormMessage(payload.message || "Client saved successfully.", "success");
+          this.reset();
+        } catch (error) {
+          showFormMessage(error && error.message ? error.message : "Failed to save client.", "danger");
+        } finally {
+          if (submitButton) submitButton.disabled = false;
+        }
       });
     </script>
     <!--   Core JS Files   -->

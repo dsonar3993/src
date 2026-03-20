@@ -12,7 +12,7 @@
       href="src/assets/img/apple-icon.png"
     />
     <link rel="icon" type="image/png" href="src/assets/img/favicon.png" />
-    <title>Soft UI Dashboard by Creative Tim</title>
+    <title>Soft UI Dashboard by Nilasu Consulting Services</title>
     <!--     Fonts and icons     -->
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
@@ -129,33 +129,36 @@
           .join("");
       }
 
-      function loadCandidates() {
+      async function loadCandidates() {
         hideError();
         showLoader();
+        renderTable([]);
 
-        if (typeof google === "undefined" || !google.script || !google.script.run) {
-          hideLoader();
-          showError("Google Apps Script is not available on this page.");
-          return;
-        }
-
-        google.script.run
-          .withSuccessHandler((data) => {
-            hideLoader();
-            if (!Array.isArray(data)) {
-              showError("Invalid response received while loading candidate records.");
-              renderTable([]);
-              return;
+        try {
+          const response = await fetch("api/candidates.php", {
+            method: "GET",
+            headers: {
+              "Accept": "application/json"
             }
-            renderTable(data);
-          })
-          .withFailureHandler((error) => {
-            hideLoader();
-            const message = error && error.message ? error.message : "Failed to load candidate records.";
-            showError(message);
-            renderTable([]);
-          })
-          .getCandidates();
+          });
+
+          const payload = await response.json();
+
+          if (!response.ok || !payload.success) {
+            throw new Error(payload.error || "Failed to load candidate records.");
+          }
+
+          if (!Array.isArray(payload.data)) {
+            throw new Error("Invalid response received while loading candidate records.");
+          }
+
+          renderTable(payload.data);
+        } catch (error) {
+          showError(error && error.message ? error.message : "Failed to load candidate records.");
+          renderTable([]);
+        } finally {
+          hideLoader();
+        }
       }
 
       window.addEventListener("DOMContentLoaded", loadCandidates);
@@ -720,7 +723,7 @@
                 <h5 class="mb-1">Candidates Records</h5>
                 <p class="text-sm mb-0 text-muted">Browse and review the available candidate records.</p>
               </div>
-              <a class="btn bg-gradient-primary mb-0" href="<?= getPageUrl('candidates_add') ?>">New Candidate</a>
+              <a class="btn bg-gradient-primary mb-0" href="candidates_add.html">New Candidate</a>
             </div>
           </div>
           <div class="card-body">
@@ -757,7 +760,7 @@
                   href="https://www.creative-tim.com"
                   class="font-weight-bold"
                   target="_blank"
-                  >Creative Tim</a
+                  >Nilasu Consulting Services</a
                 >
                 for a better web.
               </div>
@@ -771,7 +774,7 @@
                     href="https://www.creative-tim.com"
                     class="nav-link text-muted"
                     target="_blank"
-                    >Creative Tim</a
+                    >Nilasu Consulting Services</a
                   >
                 </li>
                 <li class="nav-item">

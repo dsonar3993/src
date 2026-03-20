@@ -12,7 +12,7 @@
       href="src/assets/img/apple-icon.png"
     />
     <link rel="icon" type="image/png" href="src/assets/img/favicon.png" />
-    <title>Soft UI Dashboard by Creative Tim</title>
+    <title>Soft UI Dashboard by Nilasu Consulting Services</title>
     <!--     Fonts and icons     -->
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
@@ -53,6 +53,122 @@
         margin-bottom: 16px;
       }
     </style>
+    <script>
+      const esfColumns = [
+        { key: "esf_id", label: "Account No." },
+        { key: "candidate_name", label: "Candidate Name" },
+        { key: "recruiter_name", label: "Recruiter Name" },
+        { key: "client_name", label: "Client Name" },
+        { key: "date_of_joining", label: "Date of Joining" },
+        { key: "mode_of_employment", label: "Employment Mode" },
+        { key: "designation", label: "Designation" },
+        { key: "billing_type", label: "Billing Type" },
+        { key: "leave_per_annum", label: "Leave / Annum" },
+        { key: "bill_rate", label: "Bill Rate" },
+        { key: "total_working_days", label: "Working Days" },
+        { key: "work_location", label: "Work Location" },
+        { key: "monthly_bill_rate", label: "Monthly Bill Rate" },
+        { key: "contract_period", label: "Contract Period" },
+        { key: "bgv_required", label: "BGV Required" },
+        { key: "subcontracting_fee_percent", label: "Subcontract %" },
+        { key: "subcontracting_amount", label: "Subcontract Amount" },
+        { key: "previous_ctc", label: "Previous CTC" },
+        { key: "bonus_given", label: "Bonus" },
+        { key: "ctc_offered", label: "CTC Offered" },
+        { key: "bonus_amount", label: "Bonus Amount" },
+        { key: "ctc_per_month", label: "CTC / Month" },
+        { key: "bonus_payment_tenure", label: "Bonus Tenure" },
+        { key: "hike_given_percent", label: "Hike %" },
+        { key: "margin_percent", label: "Margin %" },
+        { key: "burden_percent", label: "Burden %" },
+        { key: "burden_amount", label: "Burden Amount" },
+        { key: "approval", label: "Approval" },
+        { key: "gross_margin", label: "Gross Margin" }
+      ];
+
+      function showLoader() {
+        const loader = document.getElementById("loader");
+        if (loader) loader.style.display = "block";
+      }
+
+      function hideLoader() {
+        const loader = document.getElementById("loader");
+        if (loader) loader.style.display = "none";
+      }
+
+      function showError(message) {
+        const errorBox = document.getElementById("errorMessage");
+        if (!errorBox) return;
+        errorBox.textContent = message;
+        errorBox.classList.remove("d-none");
+      }
+
+      function hideError() {
+        const errorBox = document.getElementById("errorMessage");
+        if (!errorBox) return;
+        errorBox.textContent = "";
+        errorBox.classList.add("d-none");
+      }
+
+      function renderTable(rows) {
+        const theadRow = document.querySelector("#esfTable thead tr");
+        const tbody = document.querySelector("#esfTable tbody");
+        if (!theadRow || !tbody) return;
+
+        theadRow.innerHTML = esfColumns
+          .map((column) => `<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">${column.label}</th>`)
+          .join("");
+
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="29" class="text-center text-sm text-secondary py-4">No records found</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows
+          .map((row) => `
+            <tr>
+              ${esfColumns
+                .map((column, index) => {
+                  const value = row[column.key] ?? "";
+                  const cellClass = index === 0 ? "text-sm font-weight-bold" : "text-sm";
+                  return `<td class="${cellClass}">${value}</td>`;
+                })
+                .join("")}
+            </tr>
+          `)
+          .join("");
+      }
+
+      async function loadEsfRecords() {
+        hideError();
+        showLoader();
+        renderTable([]);
+
+        try {
+          const response = await fetch("api/esf.php", {
+            headers: { Accept: "application/json" }
+          });
+          const payload = await response.json();
+
+          if (!response.ok || !payload.success) {
+            throw new Error(payload.error || "Failed to load ESF records.");
+          }
+
+          if (!Array.isArray(payload.data)) {
+            throw new Error("Invalid response received while loading ESF records.");
+          }
+
+          renderTable(payload.data);
+        } catch (error) {
+          showError(error && error.message ? error.message : "Failed to load ESF records.");
+          renderTable([]);
+        } finally {
+          hideLoader();
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", loadEsfRecords);
+    </script>
   </head>
 
   <body class="g-sidenav-show bg-gray-100">
@@ -615,9 +731,19 @@
             </div>
           </div>
           <div class="card-body">
-            <div class="border border-dashed border-radius-md p-4 text-center bg-gray-100">
-              <h6 class="mb-2">View Layout Updated</h6>
-              <p class="text-sm text-muted mb-0">This page now matches the ESF add page theme and is ready for record listing or table integration.</p>
+            <div id="errorMessage" class="alert alert-danger text-white d-none" role="alert"></div>
+            <div class="table-responsive">
+              <table id="esfTable" class="table align-items-center mb-0">
+                <thead>
+                  <tr></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div id="loader" class="text-center py-4" style="display: none">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
             </div>
           </div>
         </div>
@@ -638,7 +764,7 @@
                   href="https://www.creative-tim.com"
                   class="font-weight-bold"
                   target="_blank"
-                  >Creative Tim</a
+                  >Nilasu Consulting Services</a
                 >
                 for a better web.
               </div>
@@ -652,7 +778,7 @@
                     href="https://www.creative-tim.com"
                     class="nav-link text-muted"
                     target="_blank"
-                    >Creative Tim</a
+                    >Nilasu Consulting Services</a
                   >
                 </li>
                 <li class="nav-item">

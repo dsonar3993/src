@@ -12,7 +12,7 @@
       href="src/assets/img/apple-icon.png"
     />
     <link rel="icon" type="image/png" href="src/assets/img/favicon.png" />
-    <title>Soft UI Dashboard by Creative Tim</title>
+    <title>Soft UI Dashboard by Nilasu Consulting Services</title>
     <!--     Fonts and icons     -->
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
@@ -608,6 +608,7 @@
             <p class="text-sm mb-0 text-muted">Fill in the candidate details below.</p>
           </div>
           <div class="card-body">
+            <div id="formMessage" class="alert d-none" role="alert"></div>
             <form id="candidateForm">
               <div class="row g-4">
                 <div class="col-lg-3 col-md-6">
@@ -735,7 +736,7 @@
                   href="https://www.creative-tim.com"
                   class="font-weight-bold"
                   target="_blank"
-                  >Creative Tim</a
+                  >Nilasu Consulting Services</a
                 >
                 for a better web.
               </div>
@@ -749,7 +750,7 @@
                     href="https://www.creative-tim.com"
                     class="nav-link text-muted"
                     target="_blank"
-                    >Creative Tim</a
+                    >Nilasu Consulting Services</a
                   >
                 </li>
                 <li class="nav-item">
@@ -782,6 +783,74 @@
         </div>
       </footer>
     </main>
+    <script>
+      function showFormMessage(message, type = "success") {
+        const box = document.getElementById("formMessage");
+        if (!box) return;
+        box.className = `alert alert-${type} d-block`;
+        box.textContent = message;
+      }
+
+      function hideFormMessage() {
+        const box = document.getElementById("formMessage");
+        if (!box) return;
+        box.className = "alert d-none";
+        box.textContent = "";
+      }
+
+      document.getElementById("candidateForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        hideFormMessage();
+
+        const submitButton = this.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+
+        const data = {
+          candidateName: candidateName.value.trim(),
+          gender: gender.value,
+          email: email.value.trim(),
+          mobile: mobile.value.trim(),
+          altMobile: altMobile.value.trim(),
+          dob: dob.value,
+          emergencyNumber: emergencyNumber.value.trim(),
+          emergencyPerson: emergencyPerson.value.trim(),
+          primarySkills: primarySkills.value.trim(),
+          secondarySkills: secondarySkills.value.trim(),
+          maritalStatus: maritalStatus.value,
+          pan: pan.value.trim(),
+          totalExp: totalExp.value,
+          relevantExp: relevantExp.value,
+          presentAddress: presentAddress.value.trim(),
+          permanentAddress: permanentAddress.value.trim(),
+          selfInsurance: selfInsurance.value,
+          dependantsInsurance: dependantsInsurance.value
+        };
+
+        try {
+          const response = await fetch("api/candidate_create.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            body: JSON.stringify(data)
+          });
+
+          const payload = await response.json();
+
+          if (!response.ok || !payload.success) {
+            throw new Error(payload.error || "Failed to save candidate.");
+          }
+
+          showFormMessage(payload.message || "Candidate saved successfully.", "success");
+          this.reset();
+        } catch (error) {
+          showFormMessage(error && error.message ? error.message : "Failed to save candidate.", "danger");
+        } finally {
+          if (submitButton) submitButton.disabled = false;
+        }
+      });
+    </script>
     <!--   Core JS Files   -->
     <script src="src/assets/js/core/popper.min.js"></script>
     <script src="src/assets/js/core/bootstrap.min.js"></script>
